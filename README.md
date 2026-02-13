@@ -1,95 +1,113 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask"/>
+  <img src="https://img.shields.io/badge/SQLAlchemy-2.0-red?style=for-the-badge&logo=sqlalchemy" alt="SQLAlchemy"/>
+</p>
+
 # BPM Flask Claims API
 
-A Flask-based REST API for **claims and policy management**, designed to integrate with BPM workflows (e.g. Camunda). It handles claim submission, policy validation, document storage, approval/rejection, and payment triggering, with full audit history.
+<p align="center">
+  <strong>REST API for claims & policy lifecycle — from submission to payout.</strong>
+</p>
 
-## Features
+<p align="center">
+  Built for BPM workflows (e.g. Camunda). Submit claims, validate policies, store documents, approve or reject, trigger payment — with full audit history.
+</p>
 
-- **Claims** – Create, list, reject, and approve claims with status tracking
-- **Policies** – Add and list policies; validate policy and coverage for claims
-- **Documents** – Store and link documents to claims; request additional documents
-- **Claim history** – Audit trail of status changes (SUBMITTED → VALIDATED → APPROVED/REJECTED)
-- **Payment** – Trigger payment and update policy status after approval
-- **Logging** – Request and status changes logged to `claims.log`
+---
 
-## Tech Stack
+## ✨ What it does
 
-- **Python 3** with **Flask 3**
-- **SQLAlchemy** + **SQLite** (`claims.db`)
-- JSON APIs suitable for BPM/camunda integration
+| | |
+|---|---|
+| **Claims** | Create, list, reject, approve — with status flow `SUBMITTED → VALIDATED → APPROVED / REJECTED` |
+| **Policies** | Add policies; validate coverage and deductible before approving claims |
+| **Documents** | Attach documents to claims; request and track additional documents |
+| **Audit** | Every status change logged in `Claims_History` and `claims.log` |
+| **Payment** | Approve claim → set payout → mark policy as `PAYMENT_TRIGGERED` |
 
-## Prerequisites
+---
 
-- Python 3.8+
-- pip
-
-## Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/shreyansh-tech21/bpm-flask-api.git
-   cd bpm-flask-api
-   ```
-
-2. **Create and activate a virtual environment** (recommended)
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate    # Windows
-   # source .venv/bin/activate   # macOS/Linux
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Running the Application
-
-From the project root:
+## 🚀 Quick start
 
 ```bash
+# Clone & enter
+git clone https://github.com/shreyansh-tech21/bpm-flask-api.git
+cd bpm-flask-api
+
+# Virtual env (recommended)
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS / Linux
+
+# Install & run
+pip install -r requirements.txt
 python app.py
 ```
 
-- The app runs at **http://127.0.0.1:5000** (Flask default).
-- On first run, the SQLite database and tables are created automatically.
-- Logs are written to `claims.log`.
+**→ API:** `http://127.0.0.1:5000` · **→ Logs:** `claims.log` · **→ DB:** `claims.db` (SQLite, auto-created)
 
-## API Endpoints
+---
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | Health / welcome message |
-| POST | `/create-claim` | Create a new claim (customerId, policyNumber, claimAmount, claimType, description, incidentDate, uploadedDocuments) |
-| POST | `/send-ack` | Send acknowledgement for a claim |
-| POST | `/validate-policy` | Validate policy for a claim (policyNumber, customerId, claimId) |
-| GET | `/claim-history` | Get full claim status history |
-| POST | `/add-policy` | Add a new policy (policyNumber, customerId, coverageLimit, deductible) |
-| POST | `/reject-claim` | Reject a claim with reason (claimId, reason) |
-| GET | `/claims` | List all claims |
-| POST | `/trigger-payment` | Approve claim and trigger payment (claimId, approvedPayout) |
-| POST | `/store-documents` | Store document metadata for a claim (claimId, uploadedDocuments) |
-| POST | `/notify-additional-documents` | Notify customer about required additional documents |
-| GET | `/policies` | List all policies |
+## 📡 API at a glance
 
-Request/response bodies are JSON unless noted otherwise.
+### Claims
+| Method | Endpoint | What it does |
+|--------|----------|----------------|
+| `POST` | `/create-claim` | Create claim (customerId, policyNumber, claimAmount, claimType, description, incidentDate, uploadedDocuments) |
+| `POST` | `/send-ack` | Send acknowledgement for a claim |
+| `POST` | `/validate-policy` | Validate policy for a claim → returns `policyValid`, `coverageLimit`, `deductible` |
+| `POST` | `/reject-claim` | Reject with reason (`claimId`, `reason`) |
+| `POST` | `/trigger-payment` | Approve and set payout (`claimId`, `approvedPayout`) |
+| `GET`  | `/claims` | List all claims |
+| `GET`  | `/claim-history` | Full audit trail of status changes |
 
-## Project Structure
+### Policies
+| Method | Endpoint | What it does |
+|--------|----------|----------------|
+| `POST` | `/add-policy` | Add policy (policyNumber, customerId, coverageLimit, deductible) |
+| `GET`  | `/policies` | List all policies |
+
+### Documents
+| Method | Endpoint | What it does |
+|--------|----------|----------------|
+| `POST` | `/store-documents` | Store document metadata for a claim (claimId, uploadedDocuments) |
+| `POST` | `/notify-additional-documents` | Notify customer about required additional documents |
+
+### Other
+| Method | Endpoint | What it does |
+|--------|----------|----------------|
+| `GET`  | `/` | Health / welcome |
+
+All request/response bodies are **JSON**.
+
+---
+
+## 📁 Project layout
 
 ```
-.
-├── app.py              # Flask app, routes, and business logic
-├── models.py           # SQLAlchemy models (Claim, Policy, Document, Claims_History)
-├── requirements.txt    # Python dependencies
-├── routes/             # Route modules (claim_routes, policy_routes, document_routes)
-├── claims.db           # SQLite database (created at runtime, gitignored)
-├── claims.log          # Application logs (gitignored)
+bpm-flask-api/
+├── app.py                 # Flask app + routes + logic
+├── models.py              # Claim, Policy, Document, Claims_History
+├── requirements.txt
+├── routes/
+│   ├── claim_routes.py
+│   ├── policy_routes.py
+│   └── document_routes.py
+├── claims.db              # SQLite (runtime, gitignored)
+├── claims.log             # Logs (gitignored)
+├── MSA_CS_GP_Software_Design_Document.pdf
 └── README.md
 ```
 
-## Design Document
+---
 
-See **MSA_CS_GP_Software_Design_Document.pdf** in this repository for the software design and requirements.
+## 📄 Design & docs
 
-## License
+Full software design and requirements: **MSA_CS_GP_Software_Design_Document.pdf** in this repo.
 
-Use as per your organization’s policy.
+---
+
+<p align="center">
+  <sub>Use as per your organization’s policy.</sub>
+</p>
